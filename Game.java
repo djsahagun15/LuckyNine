@@ -68,8 +68,97 @@ public class Game {
         this.gameLoop();
     }
 
+    private void deal() {
+        this.player.clearHand();
+        for (Player p : this.opponents) p.clearHand();
+
+        this.deck.shuffle();
+
+        this.player.drawCard(this.deck.draw());
+        this.player.drawCard(this.deck.draw());
+
+        for (Player p : this.opponents) {
+            p.drawCard(this.deck.draw());
+            p.drawCard(this.deck.draw());
+        }
+    }
+
     public void gameLoop() {
-        // TODO: Implement the main game loop and the core game logic
+        boolean emptyHands = true;
+        boolean isPlayerReady = false;
+
+        while (true) {
+            clearScreen();
+            System.out.println("Lucky Nine\n");
+
+            if (emptyHands) {
+                deal();
+
+                for (Player p : this.opponents) {
+                    int handValue = p.getHandValue();
+                    if (handValue < 7) {
+                        p.drawCard(this.deck.draw());
+                        System.out.printf("%s drew a card.\n", p.name);
+                    } else {
+                        System.out.printf("%s chose to play their card.\n", p.name);
+                    }
+                }
+
+                emptyHands = false;
+            }
+
+            if (isPlayerReady) {
+                Player winner = this.player;
+                int highest = this.player.getHandValue();
+
+                for (Player p : this.opponents) {
+                    int handValue = p.getHandValue();
+                    if (handValue > highest) {
+                        winner = p;
+                        highest = handValue;
+                    }
+                }
+
+                for (Player p : this.opponents) {
+                    System.out.println(p.toString() + (p == winner ? "\t<--- WINNER ---" : ""));
+                }
+                
+                if (this.player == winner) {
+                    System.out.println('\n' + this.player.toString() + "\t<--- WINNER ---");
+                    System.out.println("Value: " + this.player.getHandValue());
+                    System.out.println("\nYOU WIN! Press ENTER to play again");
+                } else {
+                    System.out.println('\n' + this.player.toString());
+                    System.out.println("Value: " + this.player.getHandValue());
+                    System.out.println("\nYOU LOSE! Press ENTER to play again");
+                }
+
+                try {
+                    enterOnly();
+                } catch (IOException e) {}
+
+                emptyHands = true;
+                isPlayerReady = false;
+            } else {
+                System.out.println('\n' + this.player.toString());
+                System.out.printf("Value: %d\n\n", this.player.getHandValue());
+                
+                try {
+                    System.out.print("[1] Draw 1 more card\n[2] Play\nInput: ");
+                    String input = scan.nextLine();
+    
+                    int selection = Integer.parseInt(input);
+                    switch (selection) {
+                        case 1 -> {
+                            this.player.drawCard(this.deck.draw());
+                            isPlayerReady = true;
+                        }
+                        case 2 -> isPlayerReady = true;
+                        default -> throw new Exception();
+                    }
+                } catch (Exception ime) {}
+            }
+        }
     }
 
     @SuppressWarnings("CallToPrintStackTrace")
