@@ -35,6 +35,8 @@ public class Game {
             try {
                 int count = Integer.parseInt(input);
 
+                if (count <= 0 || count > 9) throw new Exception();
+
                 this.opponents = new ArrayList<>();
                 
                 for (int n = 0; n < count; ++n) {
@@ -43,7 +45,7 @@ public class Game {
                     
                     System.out.println(name + " created");
                 }
-            } catch (NumberFormatException e) {
+            } catch (Exception e) {
                 System.out.println("Invalid: the input must be a non-negative integer between 1 and 9");
                 System.out.print("Press ENTER to try again...");
                 
