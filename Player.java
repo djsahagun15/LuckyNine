@@ -21,6 +21,14 @@ public class Player {
         this.hand.clear();
     }
 
+    public int getHandValue() {
+        int value = 0;
+        for (Card card : this.hand) {
+            value += card.getValue();
+        }
+        return value;
+    }
+
     @Override
     public String toString() {
         String handStr = "";
