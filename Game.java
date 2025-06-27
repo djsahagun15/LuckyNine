@@ -21,7 +21,7 @@ public class Game {
         clearScreen();
         
         System.out.println("Welcome to Lucky Nine!");
-        System.out.println("What's your name?: ");
+        System.out.print("What's your name?: ");
         String name = scan.nextLine();
 
         this.player = new Player(name);
@@ -54,7 +54,7 @@ public class Game {
                 continue;
             }
 
-            System.out.print("The game is ready! Press ENTER to start playing Lucky Nine!");
+            System.out.print("\nThe game is ready! Press ENTER to start playing Lucky Nine!");
             
             try {
                 enterOnly();
