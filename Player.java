@@ -26,7 +26,7 @@ public class Player {
         for (Card card : this.hand) {
             value += card.getValue();
         }
-        return value;
+        return value % 10;
     }
 
     @Override
