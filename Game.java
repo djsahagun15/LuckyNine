@@ -1,8 +1,7 @@
 import java.io.IOException;
-import java.util.Scanner;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 
 public class Game {
@@ -83,9 +82,29 @@ public class Game {
         }
     }
 
+    private Player getRoundWinner(List<Player> nat9s) {
+        return nat9s.get(0);
+    }
+
+    private Player getRoundWinner() {
+        Player winner = this.player;
+        int highest = this.player.getHandValue();
+
+        for (Player p : this.opponents) {
+            int handValue = p.getHandValue();
+            if (handValue > highest) {
+                winner = p;
+                highest = handValue;
+            }
+        }
+        return winner;
+    }
+
     public void gameLoop() {
         boolean emptyHands = true;
         boolean isPlayerReady = false;
+
+        List<Player> nat9s = new ArrayList<>();
 
         while (true) {
             clearScreen();
@@ -96,7 +115,10 @@ public class Game {
 
                 for (Player p : this.opponents) {
                     int handValue = p.getHandValue();
-                    if (handValue < 7) {
+                    
+                    if (handValue == 9) {
+                        nat9s.add(p);
+                    } else if (handValue < 7) {
                         p.drawCard(this.deck.draw());
                         System.out.printf("%s drew a card.\n", p.name);
                     } else {
@@ -108,19 +130,13 @@ public class Game {
             }
 
             if (isPlayerReady) {
-                Player winner = this.player;
-                int highest = this.player.getHandValue();
+                Player winner;
+                if (nat9s.isEmpty()) winner = this.getRoundWinner();
+                else winner = this.getRoundWinner(nat9s);
 
                 for (Player p : this.opponents) {
-                    int handValue = p.getHandValue();
-                    if (handValue > highest) {
-                        winner = p;
-                        highest = handValue;
-                    }
-                }
-
-                for (Player p : this.opponents) {
-                    System.out.println(p.toString() + (p == winner ? "\t<--- WINNER ---" : ""));
+                    boolean isWinner = p == winner;
+                    System.out.printf("%-25s = %-3d%s\n", p.toString(), p.getHandValue(), isWinner ? "\t<--- WINNER ---" : "");
                 }
                 
                 if (this.player == winner) {
@@ -139,6 +155,8 @@ public class Game {
 
                 emptyHands = true;
                 isPlayerReady = false;
+
+                nat9s.clear();
             } else {
                 System.out.println('\n' + this.player.toString());
                 System.out.printf("Value: %d\n\n", this.player.getHandValue());

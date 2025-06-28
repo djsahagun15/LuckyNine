@@ -35,7 +35,7 @@ public class Card {
 
     @Override
     public String toString() {
-        return "" + this.rank + this.suit;
+        return String.format("%-2s%c", this.rank, this.suit);
     }
 
     public int getValue() {
