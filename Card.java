@@ -1,16 +1,16 @@
 public class Card {
-    private String suit;
-    private String rank;
+    private final char suit;
+    private final String rank;
 
     private int value;
 
     public Card(String suit, String rank) {
         switch (suit) {
-            case "hearts" -> { this.suit = "\u2665"; }
-            case "diamonds" -> { this.suit = "\u2666"; }
-            case "clubs" -> { this.suit = "\u2663"; }
-            case "spades" -> { this.suit = "\u2660"; }
-            default -> { this.suit = "?"; }
+            case "hearts" -> { this.suit = '\u2665'; }
+            case "diamonds" -> { this.suit = '\u2666'; }
+            case "clubs" -> { this.suit = '\u2663'; }
+            case "spades" -> { this.suit = '\u2660'; }
+            default -> { this.suit = '?'; }
         }
 
         switch (rank) {
