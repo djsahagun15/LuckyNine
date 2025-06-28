@@ -1,7 +1,9 @@
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
 
 public class Game {
@@ -47,19 +49,13 @@ public class Game {
             } catch (Exception e) {
                 System.out.println("Invalid: the input must be a non-negative integer between 1 and 9");
                 System.out.print("Press ENTER to try again...");
-                
-                try {
-                    enterOnly();
-                } catch (IOException ex) {}
+                enterOnly();
 
                 continue;
             }
 
             System.out.print("\nThe game is ready! Press ENTER to start playing Lucky Nine!");
-            
-            try {
-                enterOnly();
-            } catch (IOException ex) {}
+            enterOnly();
 
             break;
         }
@@ -71,8 +67,6 @@ public class Game {
         this.player.clearHand();
         for (Player p : this.opponents) p.clearHand();
 
-        this.deck.shuffle();
-
         this.player.drawCard(this.deck.draw());
         this.player.drawCard(this.deck.draw());
 
@@ -82,21 +76,127 @@ public class Game {
         }
     }
 
-    private Player getRoundWinner(List<Player> nat9s) {
-        return nat9s.get(0);
+    private Player tieBreaker(List<Player> possibleWinners) {
+        if (possibleWinners.size() == 1) return possibleWinners.get(0);
+
+        clearScreen();
+        System.out.println("Lucky Nine\n");
+        
+        List<Player> next = new ArrayList<>();
+
+        for (Player p : possibleWinners) {
+            p.clearHand();
+            p.drawCard(this.deck.draw());
+        }
+
+        int highest = 0;
+        for (Player p : possibleWinners) {
+            int handValue = p.getHandValue();
+            if (handValue == highest) {
+                next.add(p);
+            } else if (handValue > highest) {
+                next.clear();
+                next.add(p);
+
+                highest = handValue;
+            }
+        }
+
+        if (possibleWinners.contains(this.player)) {
+            for (Player p : possibleWinners) {
+                if (p == this.player) continue;
+                System.out.printf("%-25s = %-3d%s\n", p.toString(), p.getHandValue(), next.contains(p) ? "--- TIE ---" : "");
+            }
+        
+            if (next.contains(this.player)) {
+                System.out.printf("\n%-25s = %-3d%s\n", this.player.toString(), this.player.getHandValue(), "--- TIE ---");
+                System.out.print("\nDRAW! Press ENTER to draw another card...");
+            } else {
+                System.out.printf("\n%-25s = %-3d\n", this.player.toString(), this.player.getHandValue());
+                System.out.print("\nYOU LOSE! Press ENTER to skip the round and see the winner...");
+            }
+            enterOnly();
+        }
+
+        return tieBreaker(next);
+    }
+
+    private Player getRoundWinner(Set<Player> nat9s) {
+        if (nat9s.size() > 1) {
+            for (Player p : this.opponents) {
+                System.out.printf("%-25s = %-3d%s\n", p.toString(), p.getHandValue(), nat9s.contains(p) ? "--- TIE ---" : "");
+            }
+    
+            System.out.printf("\n%-25s = %-3d%s\n", this.player.toString(), this.player.getHandValue(), nat9s.contains(this.player) ? "--- TIE ---" : "");
+
+            if (nat9s.contains(this.player)) System.out.print("\nDRAW! Press ENTER to draw another card...");
+            else System.out.print("\nYOU LOSE! Press ENTER to skip the round and see the winner...");
+
+            enterOnly();
+
+            return tieBreaker(new ArrayList<>(nat9s));
+        }
+
+        for (Player p : this.opponents) {
+            System.out.printf("%-25s = %-3d%s\n", p.toString(), p.getHandValue(), nat9s.contains(p) ? "<--- WINNER ---" : "");
+        }
+
+        System.out.printf("\n%-25s = %-3d%s\n", this.player.toString(), this.player.getHandValue(), nat9s.contains(this.player) ? "--- WINNER ---" : "");
+
+        if (nat9s.contains(this.player)) System.out.print("\nDRAW! Press ENTER to draw another card...");
+        else System.out.print("\nYOU LOSE! Press ENTER to start the next round...");
+        
+
+        return nat9s.iterator().next();
     }
 
     private Player getRoundWinner() {
-        Player winner = this.player;
+        List<Player> possibleWinners = new ArrayList<>();
+        possibleWinners.add(this.player);
+        
         int highest = this.player.getHandValue();
 
         for (Player p : this.opponents) {
             int handValue = p.getHandValue();
-            if (handValue > highest) {
-                winner = p;
+            if (handValue == highest) {
+                possibleWinners.add(p);
+            } else if (handValue > highest) {
+                possibleWinners.clear();
+                possibleWinners.add(p);
+
                 highest = handValue;
             }
         }
+
+        Player winner = possibleWinners.iterator().next();
+        if (possibleWinners.size() > 1) {
+            for (Player p : this.opponents) {
+                System.out.printf("%-25s = %-3d%s\n", p.toString(), p.getHandValue(), possibleWinners.contains(p) ? "--- TIE ---" : "");
+            }
+            
+            if (possibleWinners.contains(this.player)) {
+                System.out.printf("\n%-25s = %-3d%s\n", this.player.toString(), this.player.getHandValue(), "--- TIE ---");
+                System.out.println("\nDRAW! Press ENTER to draw another card...");
+            } else {
+                System.out.printf("\n%-25s = %-3d\n", this.player.toString(), this.player.getHandValue());
+                System.out.println("\nYOU LOSE! Press ENTER to skip the round and see the winner...");
+            }
+            enterOnly();
+            
+            winner = tieBreaker(possibleWinners);
+        } else {
+            for (Player p : this.opponents) {
+                System.out.printf("%-25s = %-3d%s\n", p.toString(), p.getHandValue(), p == winner ? "<--- WINNER ---" : "");
+            }
+
+            System.out.printf("\n%-25s = %-3d\n", this.player.toString(), this.player.getHandValue());
+
+            if (this.player != winner) {
+                System.out.println("\nYOU LOSE! Press ENTER to continue...");
+                enterOnly();
+            }
+        }
+        
         return winner;
     }
 
@@ -104,7 +204,7 @@ public class Game {
         boolean emptyHands = true;
         boolean isPlayerReady = false;
 
-        List<Player> nat9s = new ArrayList<>();
+        Set<Player> nat9s = new HashSet<>();
 
         while (true) {
             clearScreen();
@@ -126,32 +226,25 @@ public class Game {
                     }
                 }
 
+                if (this.player.getHandValue() == 9) {
+                    nat9s.add(this.player);
+                }
+
                 emptyHands = false;
             }
 
             if (isPlayerReady) {
                 Player winner;
-                if (nat9s.isEmpty()) winner = this.getRoundWinner();
-                else winner = this.getRoundWinner(nat9s);
+                if (!nat9s.isEmpty()) winner = this.getRoundWinner(nat9s);
+                else winner = this.getRoundWinner();
 
-                for (Player p : this.opponents) {
-                    boolean isWinner = p == winner;
-                    System.out.printf("%-25s = %-3d%s\n", p.toString(), p.getHandValue(), isWinner ? "\t<--- WINNER ---" : "");
-                }
-                
+
                 if (this.player == winner) {
-                    System.out.println('\n' + this.player.toString() + "\t<--- WINNER ---");
-                    System.out.println("Value: " + this.player.getHandValue());
                     System.out.println("\nYOU WIN! Press ENTER to play again");
                 } else {
-                    System.out.println('\n' + this.player.toString());
-                    System.out.println("Value: " + this.player.getHandValue());
-                    System.out.println("\nYOU LOSE! Press ENTER to play again");
+                    System.out.printf("\n%s won this round! Press ENTER to start the next round...", winner.name);
                 }
-
-                try {
-                    enterOnly();
-                } catch (IOException e) {}
+                enterOnly();
 
                 emptyHands = true;
                 isPlayerReady = false;
@@ -169,6 +262,7 @@ public class Game {
                     switch (selection) {
                         case 1 -> {
                             this.player.drawCard(this.deck.draw());
+                            nat9s.remove(this.player);
                             isPlayerReady = true;
                         }
                         case 2 -> isPlayerReady = true;
@@ -194,10 +288,12 @@ public class Game {
         }
     }
 
-    private static void enterOnly() throws IOException {
-        while (true) {
-            int input = System.in.read();
-            if (input == '\n') break;
-        }
+    private static void enterOnly() {
+        try {
+            while (true) {
+                int input = System.in.read();
+                if (input == '\n') break;
+            }
+        } catch (IOException e ) {}
     }
 }

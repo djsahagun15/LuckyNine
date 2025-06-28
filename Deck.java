@@ -2,23 +2,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import java.util.Random;
 
+public final class Deck {
+    private final List<Card> cards;
 
-public class Deck {
-    private final Random random = new Random();
-    
-    private static class Pair {
-        public final Card card;
-        public Boolean drawn;
-        
-        public Pair(Card card, Boolean drawn) {
-            this.card = card;
-            this.drawn = drawn;
-        }
-    }
-
-    private final List<Pair> cards;
+    private int top;
 
     public Deck() {
         String[] suits = { "hearts", "diamonds", "clubs", "spades" };
@@ -28,34 +16,27 @@ public class Deck {
 
         for (String suit : suits) {
             for (String rank : ranks) {
-                this.cards.add(new Pair(new Card(suit, rank), false));
+                this.cards.add(new Card(suit, rank));
             }
         }
+
+        top = 0;
+
+        shuffle();
     }
 
     public void shuffle() {
-        for (Pair p : cards) {
-            p.drawn = false;
-        }
-
         Collections.shuffle(this.cards);
     }
 
     public Card draw() {
-        int iter = 0;
-
-        while (iter < 52) {
-            int index = random.nextInt(this.cards.size());
-            
-            Pair pair = this.cards.get(index);
-            if (!pair.drawn) {
-                pair.drawn = true;
-                return pair.card;
-            }
-
-            ++iter;
+        if (this.top == 51) {
+            this.top = 0;
+            this.shuffle();
         }
+        
+        Card card = this.cards.get(top++);
 
-        return null;
+        return card;
     }
 }
