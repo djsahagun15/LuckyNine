@@ -206,7 +206,8 @@ public class Game {
 
         Set<Player> nat9s = new HashSet<>();
 
-        while (true) {
+        boolean shouldContinue = true;
+        while (shouldContinue) {
             clearScreen();
             System.out.println("Lucky Nine\n");
 
@@ -242,14 +243,27 @@ public class Game {
                 if (this.player == winner) {
                     System.out.println("\nYOU WIN! Press ENTER to play again");
                 } else {
-                    System.out.printf("\n%s won this round! Press ENTER to start the next round...", winner.name);
+                    System.out.printf("\n%s won this round!\n", winner.name);
                 }
-                enterOnly();
 
                 emptyHands = true;
                 isPlayerReady = false;
 
                 nat9s.clear();
+
+                boolean validInput = false;
+                while (!validInput) {
+                    System.out.print("Do you want to play again? [Y/n]: ");
+                    String input = scan.nextLine().replaceAll("\\s+", "").toLowerCase();
+
+                    switch (input) {
+                        case "", "y" -> validInput = true;
+                        case "n" -> { validInput = true; shouldContinue = false; }
+                        default -> System.out.println("Invalid input.\n");
+                    }
+                }
+                
+                
             } else {
                 System.out.println('\n' + this.player.toString());
                 System.out.printf("Value: %d\n\n", this.player.getHandValue());
