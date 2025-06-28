@@ -23,8 +23,13 @@ public class Main {
         System.out.println("  \\/_____/   \\/_____/   \\/_____/   \\/_/\\/_/   \\/_____/      \\/_/ \\/_/   \\/_/   \\/_/ \\/_/   \\/_____/ ");
         System.out.println("\u001B[0m");
 
-        System.out.print("Game is starting...");
-        Thread.sleep(2000);
+        System.out.print("Press ENTER to start playing...");
+        try {
+            while (true) {
+                int input = System.in.read();
+                if (input == '\n') break;
+            }
+        } catch (IOException e ) {}
 
         Game game = new Game();
         game.start();

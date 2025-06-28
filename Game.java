@@ -109,8 +109,11 @@ public class Game {
             }
         
             if (next.contains(this.player)) {
-                System.out.printf("\n%-25s = %-3d%s\n", this.player.toString(), this.player.getHandValue(), "--- TIE ---");
-                System.out.print("\nDRAW! Press ENTER to draw another card...");
+                boolean playerWon = next.size() == 1;
+                System.out.printf("\n%-25s = %-3d%s\n", this.player.toString(), this.player.getHandValue(), playerWon ? "<--- WINNER ---" : "--- TIE ---");
+
+                if (playerWon) System.out.print("\n YOU WIN! Press ENTER to continue...");
+                else System.out.print("\nDRAW! Press ENTER to draw another card...");
             } else {
                 System.out.printf("\n%-25s = %-3d\n", this.player.toString(), this.player.getHandValue());
                 System.out.print("\nYOU LOSE! Press ENTER to skip the round and see the winner...");
@@ -141,7 +144,7 @@ public class Game {
             System.out.printf("%-25s = %-3d%s\n", p.toString(), p.getHandValue(), nat9s.contains(p) ? "<--- WINNER ---" : "");
         }
 
-        System.out.printf("\n%-25s = %-3d%s\n", this.player.toString(), this.player.getHandValue(), nat9s.contains(this.player) ? "--- WINNER ---" : "");
+        System.out.printf("\n%-25s = %-3d%s\n", this.player.toString(), this.player.getHandValue(), nat9s.contains(this.player) ? "<--- WINNER ---" : "");
 
         if (nat9s.contains(this.player)) System.out.print("\nDRAW! Press ENTER to draw another card...");
         else System.out.print("\nYOU LOSE! Press ENTER to start the next round...");
@@ -189,7 +192,7 @@ public class Game {
                 System.out.printf("%-25s = %-3d%s\n", p.toString(), p.getHandValue(), p == winner ? "<--- WINNER ---" : "");
             }
 
-            System.out.printf("\n%-25s = %-3d\n", this.player.toString(), this.player.getHandValue());
+            System.out.printf("\n%-25s = %-3d%s\n", this.player.toString(), this.player.getHandValue(), this.player == winner ? "<--- WINNER ---" : "");
 
             if (this.player != winner) {
                 System.out.println("\nYOU LOSE! Press ENTER to continue...");
