@@ -103,22 +103,31 @@ public class Game {
         }
 
         if (possibleWinners.contains(this.player)) {
+            if (next.size() > 1) {
+                for (Player p : possibleWinners) {
+                    if (p == this.player) continue;
+                    System.out.printf("%-25s = %-3d%s\n", p.toString(), p.getHandValue(), next.contains(p) ? "--- TIE ---" : "");
+                }
+
+                if (next.contains(this.player)) {
+                    System.out.printf("%-25s = %-3d%s\n", this.player.toString(), this.player.getHandValue(), "--- TIE ---");
+                    System.out.print("\nDRAW! Press ENTER to draw another card...");
+                } else {
+                    System.out.printf("%-25s = %-3d\n", this.player.toString(), this.player.getHandValue());
+                    System.out.print("\nYOU LOSE! Press ENTER to skip the round and see the winner...");
+                }
+
+                enterOnly();
+
+                return tieBreaker(next);
+            }
+
             for (Player p : possibleWinners) {
                 if (p == this.player) continue;
-                System.out.printf("%-25s = %-3d%s\n", p.toString(), p.getHandValue(), next.contains(p) ? "--- TIE ---" : "");
+                System.out.printf("%-25s = %-3d%s\n", p.toString(), p.getHandValue(), next.contains(p) ? "<--- WINNER ---" : "");
             }
         
-            if (next.contains(this.player)) {
-                boolean playerWon = next.size() == 1;
-                System.out.printf("\n%-25s = %-3d%s\n", this.player.toString(), this.player.getHandValue(), playerWon ? "<--- WINNER ---" : "--- TIE ---");
-
-                if (playerWon) System.out.print("\n YOU WIN! Press ENTER to continue...");
-                else System.out.print("\nDRAW! Press ENTER to draw another card...");
-            } else {
-                System.out.printf("\n%-25s = %-3d\n", this.player.toString(), this.player.getHandValue());
-                System.out.print("\nYOU LOSE! Press ENTER to skip the round and see the winner...");
-            }
-            enterOnly();
+            System.out.printf("%-25s = %-3d%s\n", this.player.toString(), this.player.getHandValue(), next.contains(this.player) ? "<--- WINNER ---" : "");
         }
 
         return tieBreaker(next);
@@ -145,10 +154,6 @@ public class Game {
         }
 
         System.out.printf("\n%-25s = %-3d%s\n", this.player.toString(), this.player.getHandValue(), nat9s.contains(this.player) ? "<--- WINNER ---" : "");
-
-        if (nat9s.contains(this.player)) System.out.print("\nYOU WIN! Press ENTER to draw another card...");
-        else System.out.print("\nYOU LOSE! Press ENTER to start the next round...");
-        
 
         return nat9s.iterator().next();
     }
@@ -193,11 +198,6 @@ public class Game {
             }
 
             System.out.printf("\n%-25s = %-3d%s\n", this.player.toString(), this.player.getHandValue(), this.player == winner ? "<--- WINNER ---" : "");
-
-            if (this.player != winner) {
-                System.out.println("\nYOU LOSE! Press ENTER to continue...");
-                enterOnly();
-            }
         }
         
         return winner;
@@ -256,7 +256,7 @@ public class Game {
 
                 boolean validInput = false;
                 while (!validInput) {
-                    System.out.print("Do you want to play again? [Y/n]: ");
+                    System.out.print("\nDo you want to play again? [Y/n]: ");
                     String input = scan.nextLine().replaceAll("\\s+", "").toLowerCase();
 
                     switch (input) {
