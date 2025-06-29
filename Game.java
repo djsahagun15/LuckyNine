@@ -146,7 +146,7 @@ public class Game {
 
         System.out.printf("\n%-25s = %-3d%s\n", this.player.toString(), this.player.getHandValue(), nat9s.contains(this.player) ? "<--- WINNER ---" : "");
 
-        if (nat9s.contains(this.player)) System.out.print("\nDRAW! Press ENTER to draw another card...");
+        if (nat9s.contains(this.player)) System.out.print("\nYOU WIN! Press ENTER to draw another card...");
         else System.out.print("\nYOU LOSE! Press ENTER to start the next round...");
         
 
